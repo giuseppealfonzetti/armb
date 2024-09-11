@@ -20,3 +20,5 @@ Imports:
     Rcpp,
     RcppEigen,
     RcppClock
+URL: https://github.com/giuseppealfonzetti/armb
+BugReports: https://github.com/giuseppealfonzetti/armb/issues
