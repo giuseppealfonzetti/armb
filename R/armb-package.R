@@ -12,6 +12,7 @@ NULL
 #' @import RcppEigen
 ## usethis namespace: end
 NULL
+
 ## usethis namespace: start
 #' @import RcppClock
 ## usethis namespace: end

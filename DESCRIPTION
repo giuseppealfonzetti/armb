@@ -19,6 +19,7 @@ LinkingTo:
 Imports: 
     Rcpp,
     RcppEigen,
-    RcppClock
+    RcppClock,
+    boot
 URL: https://github.com/giuseppealfonzetti/armb
 BugReports: https://github.com/giuseppealfonzetti/armb/issues
