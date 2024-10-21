@@ -81,7 +81,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     CONTROL = ARM_CONTROL)
 
   res$time <- difftime(Sys.time(),start, units = 'secs')
-  res$btcov <- cov(armbt$t)
+  res$pars <- armbt$t
 
   return(res)
 }
