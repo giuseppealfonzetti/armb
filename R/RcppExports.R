@@ -65,6 +65,31 @@ armbLR <- function(Y, X, THETA0, R, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PA
     .Call(`_armb_armbLR`, Y, X, THETA0, R, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, STORE, SKIP_PRINT, SEED, VERBOSE)
 }
 
+#' @export
+armGLM <- function(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE) {
+    .Call(`_armb_armGLM`, Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE)
+}
+
+#' @export
+tune_armGLM <- function(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE) {
+    .Call(`_armb_tune_armGLM`, Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE)
+}
+
+#' Compute nll and ngr for logistic regression
+#'
+#' @description Used for internal testing
+#'
+#' @param Y response
+#' @param X design matrix
+#' @param THETA parameter vector
+#'
+#' @returns Provides a list with the negative log likelihood and its gradient
+#'
+#' @export
+test_glm <- function(Y, X, FAMILY, LINK, THETA) {
+    .Call(`_armb_test_glm`, Y, X, FAMILY, LINK, THETA)
+}
+
 #' Randomly shuffle rows of a matrix
 #'
 #' @param X matrix

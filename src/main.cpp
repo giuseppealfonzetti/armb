@@ -4,9 +4,10 @@
 #include <RcppEigen.h>
 #include <RcppClock.h>
 #include "logistic.h"
+#include "response.h"
 #include "utils.h"
+#include "testthatWrappers.h"
 
-// [[Rcpp::depends(RcppEigen)]]
 
 //' Fit logistic regression via ARM
 //'
@@ -265,7 +266,7 @@ Rcpp::List armbLR(
       double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*t, -PAR3);
       theta -= stepsize_t * ngr;
 
-      if(VERBOSE & (t % SKIP_PRINT == 0)) Rcpp::Rcout  <<"Iter:"<<t<<"| Idxs:"<<batch_start<<"-"<<batch_start+BATCH <<"| norm:"<< std::setprecision(4) << ngr.norm() <<"\n";
+      if(VERBOSE & (t % SKIP_PRINT == 0)) Rcpp::Rcout  <<"\rIter:"<<t<<"| Idxs:"<<batch_start<<"-"<<batch_start+BATCH <<"| norm:"<< std::setprecision(4) << ngr.norm() <<"\n";
 
 
       if(t <= BURN){
@@ -289,6 +290,189 @@ Rcpp::List armbLR(
 
   Rcpp::List output = Rcpp::List::create(
     Rcpp::Named("par") = r_theta
+  );
+
+  return output;
+}
+
+
+
+//' @export
+// [[Rcpp::export]]
+Rcpp::List armGLM(
+  const Eigen::Map<Eigen::VectorXd> Y,
+  const Eigen::Map<Eigen::MatrixXd> X,
+  const std::string FAMILY,
+  const std::string LINK,
+  const Eigen::Map<Eigen::VectorXd> THETA0,
+  const int MAXT,
+  const int BURN,
+  const int BATCH,
+  const double STEPSIZE0,
+  const double PAR1,
+  const double PAR2,
+  const double PAR3,
+  const int VERBOSE_WINDOW,
+  const int PATH_WINDOW,
+  const int SEED,
+  const bool VERBOSE
+){
+
+  Response resp(FAMILY, LINK);
+
+  // Set up clock monitor to export to R session trough RcppClock
+  Rcpp::Clock clock;
+  clock.tick("main");
+
+  // Identify dimensions
+  const int n = Y.size();
+  const int m = THETA0.size();
+
+  std::vector<int> path_iters;
+  std::vector<Eigen::VectorXd> path_theta;
+  std::vector<double> path_nll;
+
+  Eigen::VectorXd theta = THETA0;
+  Eigen::VectorXd avtheta = THETA0;
+  int last_iter = 0;
+
+
+  double nll = 10000;
+  Eigen::MatrixXd x = X;
+  Eigen::VectorXd y = Y;
+  int idx = 0;
+  int shf = 0;
+  for(int t = 0; t <= MAXT; t++){
+    Rcpp::checkUserInterrupt();
+
+    // Current nll
+    // double prev_nll = nll;
+    // nll = resp.nll_(Y, resp.linkinv_(X*theta))/n;
+
+    // Store previous iteration results
+    if(((t)%PATH_WINDOW == 0) | (t==MAXT)){
+      path_iters.push_back(t);
+      path_nll.push_back(nll);
+      path_theta.push_back(avtheta);
+    }
+
+    // Break at t == MAXT (t starts from 0)
+    if(t==MAXT){
+      last_iter = t;
+      break;
+    }
+
+    if((idx+BATCH)>n){
+      idx = 0;
+      x = shuffleRows(X, SEED + shf);
+      y = shuffleVec(Y, SEED + shf);
+      shf++;
+    }
+
+    const Eigen::MatrixXd x_t = x(Eigen::seqN(idx, BATCH), Eigen::all);
+    const Eigen::VectorXd y_t = y.segment(idx, BATCH);
+    const Eigen::VectorXd ngr = x_t.transpose()*(resp.linkinv_(x_t*theta)-y_t)/BATCH;
+
+    double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*t, -PAR3);
+    theta -= stepsize_t * ngr;
+
+    if(t <= BURN){
+      avtheta = theta;
+    }else{
+      avtheta = ( (t - BURN) * avtheta + theta ) / (t - BURN + 1);
+    }
+
+    idx += BATCH;
+    last_iter++;
+  }
+
+  clock.tock("main");
+  clock.stop("clock");
+
+  Rcpp::List output = Rcpp::List::create(
+    Rcpp::Named("path_theta") = path_theta,
+    Rcpp::Named("path_iters") = path_iters,
+    Rcpp::Named("theta") = theta,
+    Rcpp::Named("avtheta") = avtheta,
+    Rcpp::Named("last_iter") = last_iter
+  );
+
+  return output;
+}
+
+
+//' @export
+// [[Rcpp::export]]
+Rcpp::List tune_armGLM(
+  const Eigen::Map<Eigen::VectorXd> Y,
+  const Eigen::Map<Eigen::MatrixXd> X,
+  const std::string FAMILY,
+  const std::string LINK,
+  const Eigen::Map<Eigen::VectorXd> THETA0,
+  const int MAXT,
+  const int BURN,
+  const int BATCH,
+  const double STEPSIZE0,
+  const double SCALE,
+  const double MAXA,
+  const double PAR1,
+  const double PAR2,
+  const double PAR3,
+  const bool AUTO_STOP,
+  const int SKIP_PRINT,
+  const int SEED,
+  const bool VERBOSE
+){
+
+  Response resp(FAMILY, LINK);
+
+  // Set up clock monitor to export to R session trough RcppClock
+  Rcpp::Clock clock;
+  clock.tick("main");
+
+  // Identify dimensions
+  const int n = Y.size();
+  const int m = THETA0.size();
+  const int maxt = std::min(double(MAXT), double(int(n / BATCH)));
+
+  int last_update = 0;
+
+  const Eigen::MatrixXd x = shuffleRows(X, SEED);
+  std::vector<double> stepsizes;
+  std::vector<double> devresids;
+
+  double stepsize0 = STEPSIZE0;
+  for(int a = 0; a < MAXA; a++){
+
+    int idx = 0;
+    if(VERBOSE) Rcpp::Rcout  <<"Stepsize:"<<std::setprecision(4)<<stepsize0<<" | ";
+
+    Rcpp::List fit = armGLM(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, stepsize0,
+                           PAR1, PAR2, PAR3, 1, 10, SEED, false);
+
+    stepsizes.push_back(stepsize0);
+    Eigen::VectorXd avtheta = fit["avtheta"];
+    double dev = resp.dev_(Y, resp.linkinv_(X*avtheta))/n;
+    if(VERBOSE) Rcpp::Rcout  <<"dev:"<<std::setprecision(4)<<dev<<"\n";
+
+    if((a>0) & AUTO_STOP){
+      if(dev > devresids.back()){
+        devresids.push_back(dev);
+        if(VERBOSE) Rcpp::Rcout  <<"Stopped at attempt "<<a<<"\n";
+        break;
+      }
+    }
+
+    devresids.push_back(dev);
+    stepsize0 *= SCALE;
+  }
+
+  clock.tock("main");
+  clock.stop("clock");
+
+  Rcpp::List output = Rcpp::List::create(
+    Rcpp::Named("stepsizes") = stepsizes,
+    Rcpp::Named("devresids") = devresids
   );
 
   return output;

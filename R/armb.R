@@ -19,57 +19,70 @@
 #'
 #' @importFrom boot boot
 #' @export
-fastBoot <- function(DATA, R, FORMULA, MODEL = 'glm',
-                     MODEL.CONTROL = list(),
-                     SGD.CONTROL = list(method = 'asgd', npasses = 1, pass = TRUE),
-                     FR = .1,
-                     SEED = 123,
-                     NCORES = 1,
-                     TUNEFLAG = T,
-                     TUNE.CONTROL = list(FR_N = 1, MAX_ATTEMPTS = 10, TOL = 1e-5)){
-  if(!(SGD.CONTROL[['method']] %in% c('asgd', 'ai-sgd', 'numeric'))) stop('The stochastic approximation must be averaged.\nOnly `asgd` and `ai-sgd` methods are available.')
-  SGD.CONTROL[['pass']] <- TRUE
-  if(is.null(SGD.CONTROL[['start']])){SGD.CONTROL[['start']] <- rep(0, ncol(model.matrix(object = FORMULA, data = DATA)))}
+armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL){
+  start <- Sys.time()
 
-  set.seed(SEED)
-
-  tune <- list()
-  if(TUNEFLAG){
-    tune <- tuneStep(
-      FR_N = TUNE.CONTROL[['FR_N']],
-      MAX_ATTEMPTS = TUNE.CONTROL[['MAX_ATTEMPTS']],
-      MOD.CTRL = MODEL.CONTROL,
-      SGD.CTRL = SGD.CONTROL,
-      DATA = DATA,
-      FORMULA = FORMULA,
-      MODEL = MODEL,
-      TOL = TUNE.CONTROL[['TOL']]
+  res <- list()
+  if(TUNE){
+    tune <- tune_armGLM(
+      Y = as.numeric(Y),
+      X = X,
+      FAMILY = FAMILY$family,
+      LINK = FAMILY$link,
+      THETA0 = rep(0, length(MLE)),
+      MAXT = ARM_CONTROL$MAXT,
+      BURN = ARM_CONTROL$BURN,
+      BATCH = ARM_CONTROL$BATCH,
+      STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
+      SCALE = TUNE_CONTROL$SCALE,
+      MAXA = TUNE_CONTROL$MAXA,
+      PAR1 = ARM_CONTROL$PAR1,
+      PAR2 = ARM_CONTROL$PAR2,
+      PAR3 = ARM_CONTROL$PAR3,
+      AUTO_STOP = TUNE_CONTROL$AUTO,
+      VERBOSE = TUNE_CONTROL$VERBOSE,
+      SEED = ARM_CONTROL$SEED,
+      SKIP_PRINT = 0
     )
-
-    SGD.CONTROL[['lr.control']][['gamma']] <- tune$stepsize[which(tune$nll == min(tune$nll))]
+    res$tune <- tune
+    ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$devresids)][1]
+    cat("Stepsize chosen:", round(ARM_CONTROL$STEPSIZE0, 5))
   }
 
-  sgdFun <- function(D, IDX,FORMULA, MODEL, MODEL.CONTROL, SGD.CONTROL, FR){
-    sgd.ctrl <- SGD.CONTROL
-    mod <- sgd::sgd(formula = FORMULA, model = MODEL,
-                    model.control = MODEL.CONTROL, sgd.control = sgd.ctrl,
-                    data = D[IDX[1:(FR*nrow(D))], ])
+  sgdFun <- function(DATA,  IDX, THETA0, CONTROL){
+    fit <- armGLM(Y = as.numeric(DATA[IDX,1]),
+                  X = DATA[IDX,-1],
+                  FAMILY = FAMILY$family,
+                  LINK = FAMILY$link,
+                  THETA0 = THETA0,
+                  MAXT = CONTROL$MAXT,
+                  BURN = CONTROL$BURN,
+                  BATCH = CONTROL$BATCH,
+                  STEPSIZE0 = CONTROL$STEPSIZE0,
+                  PAR1 = CONTROL$PAR1,
+                  PAR2 = CONTROL$PAR2,
+                  PAR3 = CONTROL$PAR3,
+                  PATH_WINDOW = CONTROL$PATH_WINDOW,
+                  VERBOSE_WINDOW = CONTROL$VERBOSE_WINDOW,
+                  VERBOSE = CONTROL$VERBOSE,
+                  SEED = CONTROL$SEED
+    )
 
-    out <- as.numeric(mod$coefficients)
+    out <- fit$avtheta
     return(out)
   }
 
-  bt <- boot::boot(
-    data = DATA,
+  armbt <- boot(
+    data = cbind(Y, X),
     statistic = sgdFun,
-    R = R,
-    parallel = 'multicore',
+    R = NSIM,
     ncpus = NCORES,
-    FORMULA = FORMULA,
-    MODEL = MODEL,
-    FR = FR,
-    MODEL.CONTROL = MODEL.CONTROL,
-    SGD.CONTROL = SGD.CONTROL)
+    THETA0 = MLE,#
+    CONTROL = ARM_CONTROL)
 
-  return(list(tune = tune, bt = bt))
+  res$time <- difftime(Sys.time(),start, units = 'secs')
+  res$btcov <- cov(armbt$t)
+
+  return(res)
 }
+
