@@ -315,7 +315,10 @@ Rcpp::List armGLM(
   const int VERBOSE_WINDOW,
   const int PATH_WINDOW,
   const int SEED,
-  const bool VERBOSE
+  const bool VERBOSE,
+  const int CONV_WINDOW = 1000,
+  const bool CONV_CHECK = false,
+  const double TOL = 1e-5
 ){
 
   Response resp(FAMILY, LINK);
@@ -338,16 +341,14 @@ Rcpp::List armGLM(
 
 
   double nll = 10000;
+  double prev_nll;
+  bool convergence = false;
   Eigen::MatrixXd x = X;
   Eigen::VectorXd y = Y;
   int idx = 0;
   int shf = 0;
   for(int t = 0; t <= MAXT; t++){
     Rcpp::checkUserInterrupt();
-
-    // Current nll
-    // double prev_nll = nll;
-    // nll = resp.nll_(Y, resp.linkinv_(X*theta))/n;
 
     // Store previous iteration results
     if(((t)%PATH_WINDOW == 0) | (t==MAXT)){
@@ -356,7 +357,22 @@ Rcpp::List armGLM(
       path_theta.push_back(avtheta);
     }
 
+    if(CONV_CHECK & (t>BURN)){
+      if(t%CONV_WINDOW == 0){
+        // Current nll
+        prev_nll = nll;
+        nll = resp.nll_(Y, resp.linkinv_(X*avtheta))/n;
+        if(VERBOSE) Rcpp::Rcout <<"Iter "<< t<< ", nll: " << nll << "\n";
+
+        if((prev_nll-nll)/CONV_WINDOW <=TOL | (nll-prev_nll)>0){
+          convergence = true;
+          last_iter = t;
+          break;
+        }
+      }
+    }
     // Break at t == MAXT (t starts from 0)
+
     if(t==MAXT){
       last_iter = t;
       break;
@@ -392,10 +408,11 @@ Rcpp::List armGLM(
   Rcpp::List output = Rcpp::List::create(
     Rcpp::Named("path_theta") = path_theta,
     Rcpp::Named("path_iters") = path_iters,
+    Rcpp::Named("path_nll") = path_nll,
     Rcpp::Named("theta") = theta,
     Rcpp::Named("avtheta") = avtheta,
-    Rcpp::Named("last_iter") = last_iter
-    // Rcpp::Named("nll") = resp.nll_(Y, resp.linkinv_(X*theta))
+    Rcpp::Named("last_iter") = last_iter,
+    Rcpp::Named("convergence") = convergence
   );
 
   return output;

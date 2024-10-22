@@ -100,8 +100,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // armGLM
-Rcpp::List armGLM(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double PAR1, const double PAR2, const double PAR3, const int VERBOSE_WINDOW, const int PATH_WINDOW, const int SEED, const bool VERBOSE);
-RcppExport SEXP _armb_armGLM(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP VERBOSE_WINDOWSEXP, SEXP PATH_WINDOWSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP) {
+Rcpp::List armGLM(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double PAR1, const double PAR2, const double PAR3, const int VERBOSE_WINDOW, const int PATH_WINDOW, const int SEED, const bool VERBOSE, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
+RcppExport SEXP _armb_armGLM(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP VERBOSE_WINDOWSEXP, SEXP PATH_WINDOWSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -121,7 +121,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type PATH_WINDOW(PATH_WINDOWSEXP);
     Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
     Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
-    rcpp_result_gen = Rcpp::wrap(armGLM(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE));
+    Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
+    Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
+    rcpp_result_gen = Rcpp::wrap(armGLM(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE, CONV_WINDOW, CONV_CHECK, TOL));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -259,7 +262,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_armb_armLR2", (DL_FUNC) &_armb_armLR2, 14},
     {"_armb_tune_armLR", (DL_FUNC) &_armb_tune_armLR, 16},
     {"_armb_armbLR", (DL_FUNC) &_armb_armbLR, 15},
-    {"_armb_armGLM", (DL_FUNC) &_armb_armGLM, 16},
+    {"_armb_armGLM", (DL_FUNC) &_armb_armGLM, 19},
     {"_armb_tune_armGLM", (DL_FUNC) &_armb_tune_armGLM, 18},
     {"_armb_test_glm", (DL_FUNC) &_armb_test_glm, 5},
     {"_armb_shuffleRows", (DL_FUNC) &_armb_shuffleRows, 2},

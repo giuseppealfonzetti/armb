@@ -19,11 +19,12 @@
 #'
 #' @importFrom boot boot
 #' @export
-armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL, VERBOSE = FALSE){
+armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE_STEP, TUNE_GAMMA, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL, VERBOSE = FALSE){
   start <- Sys.time()
 
   res <- list()
-  if(TUNE){
+  if(TUNE_STEP){
+    if(VERBOSE)cat("Tuning the stepsize... ")
     tune <- tune_armGLM(
       Y = as.numeric(Y),
       X = X,
@@ -46,7 +47,33 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     )
     res$tune <- tune
     ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$devresids)][1]
-    if(VERBOSE)cat("Stepsize chosen:", round(ARM_CONTROL$STEPSIZE0, 5))
+    if(VERBOSE)cat("| Value chosen:", round(ARM_CONTROL$STEPSIZE0, 4), "\n")
+  }
+
+  if(TUNE_GAMMA){
+    if(VERBOSE)cat("Tuning gamma...        ")
+    tune <- armGLM(Y = as.numeric(Y),
+                   X = X,
+                   FAMILY = FAMILY$family,
+                   LINK = FAMILY$link,
+                   THETA0 = MLE,
+                   MAXT = ARM_CONTROL$MAXT,
+                   BURN = ARM_CONTROL$BURN,
+                   BATCH = ARM_CONTROL$BATCH,
+                   STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
+                   PAR1 = ARM_CONTROL$PAR1,
+                   PAR2 = ARM_CONTROL$PAR2,
+                   PAR3 = ARM_CONTROL$PAR3,
+                   PATH_WINDOW = ARM_CONTROL$PATH_WINDOW,
+                   VERBOSE_WINDOW = ARM_CONTROL$VERBOSE_WINDOW,
+                   VERBOSE = TUNE_CONTROL$VERBOSE,
+                   SEED = ARM_CONTROL$SEED,
+                   CONV_WINDOW = TUNE_CONTROL$CONV_WINDOW,
+                   CONV_CHECK = TRUE,
+                   TOL = TUNE_CONTROL$CONV_TOL)
+    ARM_CONTROL$MAXT <- tune$last_iter
+    if(VERBOSE)cat("| Value chosen:", round(logb(tune$last_iter, length(Y)), 4), "\n")
+
   }
 
   sgdFun <- function(DATA,  IDX, THETA0, CONTROL){
@@ -72,7 +99,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     return(out)
   }
 
-  if(VERBOSE)cat("Running ", NSIM, "ARM chains")
+  if(VERBOSE)cat("Running ", NSIM, " ARM chains... ")
   armbt <- boot(
     data = cbind(Y, X),
     statistic = sgdFun,
@@ -81,16 +108,12 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     THETA0 = MLE,#
     CONTROL = ARM_CONTROL)
 
+  res$step0 <- ARM_CONTROL$STEPSIZE0
+  res$gamma <- logb(ARM_CONTROL$MAXT, length(Y))
   res$time <- difftime(Sys.time(),start, units = 'secs')
   res$pars <- armbt$t
+  if(VERBOSE)cat("Done!\n")
 
   return(res)
 }
 
-#' @export
-tune_armb <- function(Y, X, FAMILY, MAXA, SCALE, AUTO, START, ARM_CONTROL, VERBOSE = FALSE){
-
-  for (variable in vector) {
-
-  }
-}
