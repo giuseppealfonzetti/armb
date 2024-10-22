@@ -395,6 +395,7 @@ Rcpp::List armGLM(
     Rcpp::Named("theta") = theta,
     Rcpp::Named("avtheta") = avtheta,
     Rcpp::Named("last_iter") = last_iter
+    // Rcpp::Named("nll") = resp.nll_(Y, resp.linkinv_(X*theta))
   );
 
   return output;

@@ -4,7 +4,19 @@
 \alias{armb}
 \title{ARMB nonparametric bootstrap}
 \usage{
-armb(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL)
+armb(
+  Y,
+  X,
+  FAMILY,
+  NSIM,
+  MLE,
+  TUNE,
+  NCORES,
+  SEED,
+  ARM_CONTROL,
+  TUNE_CONTROL,
+  VERBOSE = FALSE
+)
 }
 \arguments{
 \item{NCORES}{Number of cores used via the \link[pbapply]{pblapply} function.}

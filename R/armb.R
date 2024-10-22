@@ -19,7 +19,7 @@
 #'
 #' @importFrom boot boot
 #' @export
-armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL){
+armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_CONTROL, VERBOSE = FALSE){
   start <- Sys.time()
 
   res <- list()
@@ -30,7 +30,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
       FAMILY = FAMILY$family,
       LINK = FAMILY$link,
       THETA0 = rep(0, length(MLE)),
-      MAXT = ARM_CONTROL$MAXT,
+      MAXT = TUNE_CONTROL$MAXT,
       BURN = ARM_CONTROL$BURN,
       BATCH = ARM_CONTROL$BATCH,
       STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
@@ -46,7 +46,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     )
     res$tune <- tune
     ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$devresids)][1]
-    cat("Stepsize chosen:", round(ARM_CONTROL$STEPSIZE0, 5))
+    if(VERBOSE)cat("Stepsize chosen:", round(ARM_CONTROL$STEPSIZE0, 5))
   }
 
   sgdFun <- function(DATA,  IDX, THETA0, CONTROL){
@@ -72,6 +72,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
     return(out)
   }
 
+  if(VERBOSE)cat("Running ", NSIM, "ARM chains")
   armbt <- boot(
     data = cbind(Y, X),
     statistic = sgdFun,
@@ -86,3 +87,10 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE, NCORES, SEED, ARM_CONTROL, TUNE_
   return(res)
 }
 
+#' @export
+tune_armb <- function(Y, X, FAMILY, MAXA, SCALE, AUTO, START, ARM_CONTROL, VERBOSE = FALSE){
+
+  for (variable in vector) {
+
+  }
+}
