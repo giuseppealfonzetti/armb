@@ -11,7 +11,7 @@ armb(
   NSIM,
   MLE,
   TUNE_STEP,
-  TUNE_MAXT,
+  TUNE_GAMMA,
   NCORES,
   SEED,
   ARM_CONTROL,

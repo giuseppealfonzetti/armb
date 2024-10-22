@@ -72,7 +72,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE_STEP, TUNE_GAMMA, NCORES, SEED, A
                    CONV_CHECK = TRUE,
                    TOL = TUNE_CONTROL$CONV_TOL)
     ARM_CONTROL$MAXT <- tune$last_iter
-    if(VERBOSE)cat("| Value chosen:", round(logb(tune$last_iter, length(Y)), 4), "\n")
+    if(VERBOSE)cat("| Value chosen:", round(logb(tune$last_iter-ARM_CONTROL$BURN, length(Y)), 4), "\n")
 
   }
 
@@ -109,7 +109,7 @@ armb <- function(Y, X, FAMILY, NSIM, MLE, TUNE_STEP, TUNE_GAMMA, NCORES, SEED, A
     CONTROL = ARM_CONTROL)
 
   res$step0 <- ARM_CONTROL$STEPSIZE0
-  res$gamma <- logb(ARM_CONTROL$MAXT, length(Y))
+  res$gamma <- logb(ARM_CONTROL$MAXT-ARM_CONTROL$BURN, length(Y))
   res$time <- difftime(Sys.time(),start, units = 'secs')
   res$pars <- armbt$t
   if(VERBOSE)cat("Done!\n")
