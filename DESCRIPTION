@@ -20,6 +20,7 @@ Imports:
     Rcpp,
     RcppEigen,
     RcppClock,
-    boot
+    boot,
+    statmod
 URL: https://github.com/giuseppealfonzetti/armb
 BugReports: https://github.com/giuseppealfonzetti/armb/issues

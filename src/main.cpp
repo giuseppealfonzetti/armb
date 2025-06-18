@@ -7,6 +7,7 @@
 #include "response.h"
 #include "utils.h"
 #include "testthatWrappers.h"
+#include "logistic_ri.h"
 
 
 //' Fit logistic regression via ARM

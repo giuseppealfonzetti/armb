@@ -16,6 +16,40 @@ logistic_wrapper <- function(Y, X, THETA) {
     .Call(`_armb_logistic_wrapper`, Y, X, THETA)
 }
 
+logsumexp <- function(x) {
+    .Call(`_armb_logsumexp`, x)
+}
+
+innerProduct <- function(x, y) {
+    .Call(`_armb_innerProduct`, x, y)
+}
+
+likAGHi <- function(beta, logsigma, list_x, list_y, list_d, niter, ws, z, i) {
+    .Call(`_armb_likAGHi`, beta, logsigma, list_x, list_y, list_d, niter, ws, z, i)
+}
+
+grAGHi <- function(betavec, logsigma, list_x, list_y, list_d, niter, ws, z, i) {
+    .Call(`_armb_grAGHi`, betavec, logsigma, list_x, list_y, list_d, niter, ws, z, i)
+}
+
+likAGH <- function(betavec, sigma, list_x, list_y, list_d, niter, ws, z) {
+    .Call(`_armb_likAGH`, betavec, sigma, list_x, list_y, list_d, niter, ws, z)
+}
+
+grAGH <- function(beta, sigma, list_x, list_y, list_d, niter, ws, z) {
+    .Call(`_armb_grAGH`, beta, sigma, list_x, list_y, list_d, niter, ws, z)
+}
+
+#' @export
+armLOGRI <- function(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE, CONV_WINDOW = 1000L, CONV_CHECK = FALSE, TOL = 1e-5) {
+    .Call(`_armb_armLOGRI`, LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE, CONV_WINDOW, CONV_CHECK, TOL)
+}
+
+#' @export
+tune_armLOGRI <- function(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE) {
+    .Call(`_armb_tune_armLOGRI`, LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE)
+}
+
 #' Fit logistic regression via ARM
 #'
 #' @param Y response
