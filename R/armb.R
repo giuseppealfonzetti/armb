@@ -224,6 +224,7 @@ armb2 <- function(Y, X, FAMILY, NSIM, MLE, FRML=NULL, TUNE_STEP, TUNE_GAMMA, NCO
 
   }
 
+  armbt <- NULL
   sgdFun <- function(DATA,  IDX, THETA0, CONTROL){
     if(FAMILY=="LOGRI"){
       fit <- armLOGRI(
@@ -246,6 +247,7 @@ armb2 <- function(Y, X, FAMILY, NSIM, MLE, FRML=NULL, TUNE_STEP, TUNE_GAMMA, NCO
         VERBOSE = CONTROL$VERBOSE,
         SEED = CONTROL$SEED
       )
+
     }else{
       fit <- armGLM(Y = as.numeric(DATA[IDX,1]),
                     X = DATA[IDX,-1],
@@ -264,6 +266,7 @@ armb2 <- function(Y, X, FAMILY, NSIM, MLE, FRML=NULL, TUNE_STEP, TUNE_GAMMA, NCO
                     VERBOSE = CONTROL$VERBOSE,
                     SEED = CONTROL$SEED
       )
+
     }
 
 
@@ -271,14 +274,30 @@ armb2 <- function(Y, X, FAMILY, NSIM, MLE, FRML=NULL, TUNE_STEP, TUNE_GAMMA, NCO
     return(out)
   }
 
+
   if(VERBOSE)cat("Running ", NSIM, " ARM chains... ")
-  armbt <- boot(
-    data = if(FAMILY=="LOGRI"){data_list}else{cbind(Y, X)},
-    statistic = sgdFun,
-    R = NSIM,
-    ncpus = NCORES,
-    THETA0 = MLE,#
-    CONTROL = ARM_CONTROL)
+  armbt <- list()
+  if(FAMILY=="LOGRI"){
+    armbt$t <- t(sapply(
+      1:NSIM,
+      function(x){
+        set.seed(x)
+        sgdFun(DATA=data_list,
+               IDX = sample(1:length(data_list$x), length(data_list$x), replace = TRUE),
+               THETA0 = MLE,
+               CONTROL = ARM_CONTROL)
+      }
+    ))
+  }else{
+    armbt <- boot(
+      data = if(FAMILY=="LOGRI"){data_list}else{cbind(Y, X)},
+      statistic = sgdFun,
+      R = NSIM,
+      ncpus = NCORES,
+      THETA0 = MLE,#
+      CONTROL = ARM_CONTROL)
+  }
+
 
 
   res$step0 <- ARM_CONTROL$STEPSIZE0
