@@ -314,6 +314,114 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// armGLM2
+Rcpp::List armGLM2(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double PAR1, const double PAR2, const double PAR3, const int VERBOSE_WINDOW, const int PATH_WINDOW, const int SEED, const bool VERBOSE, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
+RcppExport SEXP _armb_armGLM2(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP VERBOSE_WINDOWSEXP, SEXP PATH_WINDOWSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type FAMILY(FAMILYSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type LINK(LINKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
+    Rcpp::traits::input_parameter< const int >::type MAXT(MAXTSEXP);
+    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
+    Rcpp::traits::input_parameter< const int >::type BATCH(BATCHSEXP);
+    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR1(PAR1SEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR2(PAR2SEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR3(PAR3SEXP);
+    Rcpp::traits::input_parameter< const int >::type VERBOSE_WINDOW(VERBOSE_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const int >::type PATH_WINDOW(PATH_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
+    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
+    Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
+    Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
+    rcpp_result_gen = Rcpp::wrap(armGLM2(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE, CONV_WINDOW, CONV_CHECK, TOL));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tune_armGLM2
+Rcpp::List tune_armGLM2(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double SCALE, const double MAXA, const double PAR1, const double PAR2, const double PAR3, const bool AUTO_STOP, const int SKIP_PRINT, const int SEED, const bool VERBOSE);
+RcppExport SEXP _armb_tune_armGLM2(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP SCALESEXP, SEXP MAXASEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP AUTO_STOPSEXP, SEXP SKIP_PRINTSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type FAMILY(FAMILYSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type LINK(LINKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
+    Rcpp::traits::input_parameter< const int >::type MAXT(MAXTSEXP);
+    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
+    Rcpp::traits::input_parameter< const int >::type BATCH(BATCHSEXP);
+    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
+    Rcpp::traits::input_parameter< const double >::type SCALE(SCALESEXP);
+    Rcpp::traits::input_parameter< const double >::type MAXA(MAXASEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR1(PAR1SEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR2(PAR2SEXP);
+    Rcpp::traits::input_parameter< const double >::type PAR3(PAR3SEXP);
+    Rcpp::traits::input_parameter< const bool >::type AUTO_STOP(AUTO_STOPSEXP);
+    Rcpp::traits::input_parameter< const int >::type SKIP_PRINT(SKIP_PRINTSEXP);
+    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
+    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
+    rcpp_result_gen = Rcpp::wrap(tune_armGLM2(Y, X, FAMILY, LINK, THETA0, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE));
+    return rcpp_result_gen;
+END_RCPP
+}
+// armGLM3
+Rcpp::List armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
+RcppExport SEXP _armb_armGLM3(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type FAMILY(FAMILYSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type LINK(LINKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
+    Rcpp::traits::input_parameter< const int >::type LENGTH(LENGTHSEXP);
+    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
+    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
+    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
+    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
+    Rcpp::traits::input_parameter< const int >::type TRIM(TRIMSEXP);
+    Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
+    Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
+    rcpp_result_gen = Rcpp::wrap(armGLM3(Y, X, FAMILY, LINK, THETA0, LENGTH, BURN, STEPSIZE0, SEED, VERBOSE, TRIM, CONV_WINDOW, CONV_CHECK, TOL));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tune_armGLM3
+Rcpp::List tune_armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const double SCALE, const double MAXA, const bool AUTO_STOP, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
+RcppExport SEXP _armb_tune_armGLM3(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SCALESEXP, SEXP MAXASEXP, SEXP AUTO_STOPSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type FAMILY(FAMILYSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type LINK(LINKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
+    Rcpp::traits::input_parameter< const int >::type LENGTH(LENGTHSEXP);
+    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
+    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
+    Rcpp::traits::input_parameter< const double >::type SCALE(SCALESEXP);
+    Rcpp::traits::input_parameter< const double >::type MAXA(MAXASEXP);
+    Rcpp::traits::input_parameter< const bool >::type AUTO_STOP(AUTO_STOPSEXP);
+    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
+    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
+    Rcpp::traits::input_parameter< const int >::type TRIM(TRIMSEXP);
+    Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
+    Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
+    Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
+    rcpp_result_gen = Rcpp::wrap(tune_armGLM3(Y, X, FAMILY, LINK, THETA0, LENGTH, BURN, STEPSIZE0, SCALE, MAXA, AUTO_STOP, SEED, VERBOSE, TRIM, CONV_WINDOW, CONV_CHECK, TOL));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_glm
 Rcpp::List test_glm(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, std::string FAMILY, std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA);
 RcppExport SEXP _armb_test_glm(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETASEXP) {
@@ -430,6 +538,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_armb_armbLR", (DL_FUNC) &_armb_armbLR, 15},
     {"_armb_armGLM", (DL_FUNC) &_armb_armGLM, 19},
     {"_armb_tune_armGLM", (DL_FUNC) &_armb_tune_armGLM, 18},
+    {"_armb_armGLM2", (DL_FUNC) &_armb_armGLM2, 19},
+    {"_armb_tune_armGLM2", (DL_FUNC) &_armb_tune_armGLM2, 18},
+    {"_armb_armGLM3", (DL_FUNC) &_armb_armGLM3, 14},
+    {"_armb_tune_armGLM3", (DL_FUNC) &_armb_tune_armGLM3, 17},
     {"_armb_test_glm", (DL_FUNC) &_armb_test_glm, 5},
     {"_armb_shuffleRows", (DL_FUNC) &_armb_shuffleRows, 2},
     {"_armb_shuffleVec", (DL_FUNC) &_armb_shuffleVec, 2},

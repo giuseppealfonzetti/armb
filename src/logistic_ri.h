@@ -418,7 +418,7 @@ Rcpp::List armLOGRI(
     Eigen::VectorXd ngr = grAGHi(theta.segment(0,p), theta(p), LIST_X, LIST_Y, LIST_D,
            AGH_NITER, WS, Z, obs);
 
-    // ngr.tail(1)*=10;
+    // ngr.tail(1)/=10;
     double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*(t+1), -PAR3);
     theta -= stepsize_t * ngr;
 
