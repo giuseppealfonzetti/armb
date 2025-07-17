@@ -747,15 +747,23 @@ Rcpp::List armGLM3(
   double nll_start = resp.nll_(Y, resp.linkinv_(X*mle))/n;
   double norm_delta = 0;
   double max_diff = 0;
+  double max_ngr = 0;
+  double max_pdiff = 0;
+  double nll = nll_start;
+  double prev_nll = nll_start;
+  double pf=1;
 
   std::vector<int> path_iters; path_iters.push_back(0);
   std::vector<Eigen::VectorXd> path_theta; path_theta.push_back(mle);
   std::vector<Eigen::VectorXd> path_delta; path_delta.push_back(delta);
-  // std::vector<double> path_nll; path_nll.push_back(nll);
+  std::vector<double> path_nll; path_nll.push_back(nll_start);
+  std::vector<double> path_pf; path_pf.push_back(pf);
   std::vector<double> path_norm; path_norm.push_back(norm_delta);
   std::vector<double> path_diff; path_diff.push_back(max_diff);
+  std::vector<double> path_pdiff; path_pdiff.push_back(max_pdiff);
+  std::vector<double> path_ngr; path_ngr.push_back(max_ngr);
 
-  double prev_nll;
+  Eigen::VectorXd prev_delta;
   bool convergence = false;
   Eigen::MatrixXd x = X;
   Eigen::VectorXd y = Y;
@@ -782,24 +790,34 @@ Rcpp::List armGLM3(
     // delta -= stepsize_t * ngr;
     delta -= stepsize_t * Eigen::VectorXd(ngr.array()/step_vec.array());
 
-    norm_delta = delta.norm();
-    double max_ngr = ngr.cwiseAbs().maxCoeff();
-    max_diff = max_ngr * stepsize_t;
+    if(t%TRIM == 0){
+      nll = resp.nll_(Y, resp.linkinv_(X*(delta+mle)))/n;
 
-    if(t < burn & CONV_CHECK & max_diff <= (tol) ){
-      conv_counter++;
-      if(conv_counter==CONV_WINDOW){
-        convergence = true;
-        burn = t;
-        idx = 0;
-        x = shuffleRows(X, SEED + shf);
-        y = shuffleVec(Y, SEED + shf);
-        shf++;
+      if(1){
+        pf = abs((nll-prev_nll)/prev_nll);
+        norm_delta = delta.squaredNorm()/m;
+        max_ngr = ngr.cwiseAbs().maxCoeff();
+        max_diff = max_ngr * stepsize_t;
+        
+        if(t < burn & CONV_CHECK & pf <= (TOL) ){
+          conv_counter++;
+          if(conv_counter==CONV_WINDOW){
+            convergence = true;
+            burn = t;
+            idx = 0;
+            x = shuffleRows(X, SEED + shf);
+            y = shuffleVec(Y, SEED + shf);
+            shf++;
+          }
+        }else{
+          conv_counter=0;
+        }
+
+        prev_nll=nll;
       }
-      
-    }else{
-      conv_counter = 0;
+      prev_delta=delta;
     }
+    
 
 
 
@@ -815,11 +833,15 @@ Rcpp::List armGLM3(
     if(t%TRIM == 0){
       if(VERBOSE) Rcpp::Rcout << "Iter " << t << " | Dt L2: " << norm_delta << " | Dt diff LInf: " << max_diff <<"\n";
       path_iters.push_back(t);
-      // path_nll.push_back(nll);
+      path_nll.push_back(nll);
       path_theta.push_back(delta+mle);
       path_delta.push_back(avdelta);
       path_norm.push_back(norm_delta);
       path_diff.push_back(max_diff);
+      path_ngr.push_back(max_ngr);
+      path_pf.push_back(pf);
+      // path_pdiff.push_back(max_pdiff);
+
     }
     
 
@@ -837,6 +859,10 @@ Rcpp::List armGLM3(
     Rcpp::Named("nll_end")   = nll_end,
     Rcpp::Named("path_norm") = path_norm,
     Rcpp::Named("path_diff") = path_diff,
+    Rcpp::Named("path_pdiff") = path_pdiff,
+    Rcpp::Named("path_nll") = path_nll,
+    Rcpp::Named("path_pf") = path_pf,
+    Rcpp::Named("path_ngr") = path_ngr,
     Rcpp::Named("delta") = delta,
     Rcpp::Named("avdelta") = avdelta,
     Rcpp::Named("burn") = burn,
