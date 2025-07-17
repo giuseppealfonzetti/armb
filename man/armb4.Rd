@@ -11,7 +11,6 @@ armb4(
   NSIM,
   MLE,
   TUNE_STEP,
-  TUNE_GAMMA,
   NCORES,
   SEED,
   ARM_CONTROL,
