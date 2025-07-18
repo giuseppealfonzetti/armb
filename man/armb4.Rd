@@ -15,7 +15,10 @@ armb4(
   SEED,
   ARM_CONTROL,
   TUNE_CONTROL,
-  VERBOSE = FALSE
+  VERBOSE = FALSE,
+  TYPE = c("GLM", "GLMM"),
+  FRML = NULL,
+  NGH = 9
 )
 }
 \arguments{
