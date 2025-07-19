@@ -786,8 +786,8 @@ Rcpp::List armGLM3(
     const Eigen::VectorXd y_t = y.segment(idx, 1);
     const Eigen::VectorXd ngr = x_t.transpose()*(resp.linkinv_(x_t*(delta+mle))-y_t);
 
-    // double stepsize_t = STEPSIZE0 * pow(1 + MINEIG*STEPSIZE0*(t), -.75);
-    double stepsize_t = STEPSIZE0 * pow(t, -.5001);
+    double stepsize_t = STEPSIZE0 * pow(1 + MINEIG*STEPSIZE0*(t), -.75);
+    // double stepsize_t = STEPSIZE0 * pow(t, -.5001);
 
     // delta -= stepsize_t * ngr;
     delta -= stepsize_t * Eigen::VectorXd(ngr.array()/step_vec.array());
