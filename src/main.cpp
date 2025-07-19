@@ -723,9 +723,10 @@ Rcpp::List armGLM3(
   const int SEED,
   const bool VERBOSE,
   const int TRIM=100,
-  const int CONV_WINDOW = 10,
+  const int CONV_WINDOW = 3,
   const bool CONV_CHECK = true,
-  const double TOL = 1e-5
+  const double TOL = 1e-2,
+  const double MINEIG=1e-5
 ){
 
   Response resp(FAMILY, LINK);
@@ -737,9 +738,10 @@ Rcpp::List armGLM3(
   Eigen::VectorXd mle = THETA0;
   Eigen::VectorXd delta = Eigen::VectorXd::Zero(m);
   Eigen::VectorXd avdelta = delta;
-  const Eigen::VectorXd res2 = (resp.linkinv_(X*mle)-Y).array().square();
-  const Eigen::VectorXd step_vec = (X.transpose()*(res2.asDiagonal())*X).diagonal()/n;
-  const double tol = (X.transpose()*(resp.linkinv_(X*mle)-Y)/n).cwiseAbs().maxCoeff();
+  // const Eigen::VectorXd res2 = (resp.linkinv_(X*mle)-Y).array().square();
+  // const Eigen::VectorXd step_vec = (X.transpose()*(res2.asDiagonal())*X).diagonal()/n;
+  const Eigen::VectorXd step_vec = Eigen::VectorXd::Ones(m);
+  // const double tol = (X.transpose()*(resp.linkinv_(X*mle)-Y)/n).cwiseAbs().maxCoeff();
 
 
   int last_iter = 0;
@@ -784,7 +786,7 @@ Rcpp::List armGLM3(
     const Eigen::VectorXd y_t = y.segment(idx, 1);
     const Eigen::VectorXd ngr = x_t.transpose()*(resp.linkinv_(x_t*(delta+mle))-y_t);
 
-    // double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*(t), -PAR3);
+    // double stepsize_t = STEPSIZE0 * pow(1 + MINEIG*STEPSIZE0*(t), -.75);
     double stepsize_t = STEPSIZE0 * pow(t, -.5001);
 
     // delta -= stepsize_t * ngr;
@@ -834,7 +836,7 @@ Rcpp::List armGLM3(
       if(VERBOSE) Rcpp::Rcout << "Iter " << t << " | Dt L2: " << norm_delta << " | Dt diff LInf: " << max_diff <<"\n";
       path_iters.push_back(t);
       path_nll.push_back(nll);
-      path_theta.push_back(delta+mle);
+      // path_theta.push_back(delta+mle);
       path_delta.push_back(avdelta);
       path_norm.push_back(norm_delta);
       path_diff.push_back(max_diff);
@@ -852,7 +854,7 @@ Rcpp::List armGLM3(
   double nll_end = resp.nll_(Y, resp.linkinv_(X*(avdelta+mle)))/n;
 
   Rcpp::List output = Rcpp::List::create(
-    Rcpp::Named("path_theta") = path_theta,
+    // Rcpp::Named("path_theta") = path_theta,
     Rcpp::Named("path_delta") = path_delta,
     Rcpp::Named("path_iters") = path_iters,
     Rcpp::Named("nll_start") = nll_start,
@@ -868,8 +870,7 @@ Rcpp::List armGLM3(
     Rcpp::Named("burn") = burn,
     Rcpp::Named("last_iter") = last_iter,
     Rcpp::Named("convergence") = convergence,
-    Rcpp::Named("shf") = shf,
-    Rcpp::Named("tol") = tol
+    Rcpp::Named("shf") = shf
   );
 
   return output;
@@ -894,7 +895,7 @@ Rcpp::List tune_armGLM3(
   const int TRIM=100,
   const int CONV_WINDOW = 10,
   const bool CONV_CHECK = true,
-  const double TOL = 1e-5
+  const double TOL = 1e-2
 ){
 
   Response resp(FAMILY, LINK);
