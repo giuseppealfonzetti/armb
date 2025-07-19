@@ -427,8 +427,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // armGLM3
-Rcpp::List armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
-RcppExport SEXP _armb_armGLM3(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
+Rcpp::List armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL, const double MINEIG);
+RcppExport SEXP _armb_armGLM3(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP, SEXP MINEIGSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -446,7 +446,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
     Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
     Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
-    rcpp_result_gen = Rcpp::wrap(armGLM3(Y, X, FAMILY, LINK, THETA0, LENGTH, BURN, STEPSIZE0, SEED, VERBOSE, TRIM, CONV_WINDOW, CONV_CHECK, TOL));
+    Rcpp::traits::input_parameter< const double >::type MINEIG(MINEIGSEXP);
+    rcpp_result_gen = Rcpp::wrap(armGLM3(Y, X, FAMILY, LINK, THETA0, LENGTH, BURN, STEPSIZE0, SEED, VERBOSE, TRIM, CONV_WINDOW, CONV_CHECK, TOL, MINEIG));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -597,7 +598,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_armb_tune_armGLM", (DL_FUNC) &_armb_tune_armGLM, 18},
     {"_armb_armGLM2", (DL_FUNC) &_armb_armGLM2, 19},
     {"_armb_tune_armGLM2", (DL_FUNC) &_armb_tune_armGLM2, 18},
-    {"_armb_armGLM3", (DL_FUNC) &_armb_armGLM3, 14},
+    {"_armb_armGLM3", (DL_FUNC) &_armb_armGLM3, 15},
     {"_armb_tune_armGLM3", (DL_FUNC) &_armb_tune_armGLM3, 17},
     {"_armb_test_glm", (DL_FUNC) &_armb_test_glm, 5},
     {"_armb_shuffleRows", (DL_FUNC) &_armb_shuffleRows, 2},

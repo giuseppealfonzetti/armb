@@ -565,9 +565,38 @@ armb4 <- function(
   SEED,
   ARM_CONTROL,
   TUNE_CONTROL,
-  VERBOSE = FALSE
+  VERBOSE = FALSE,
+  TYPE = c("GLM", "GLMM"),
+  FRML = NULL,
+  NGH = 9
 ) {
+  TYPE <- match.arg(TYPE)
+  if (TYPE == "GLMM" & (FAMILY$family != "binomial" | FAMILY$link != "logit")) {
+    stop("Family not implemented for GLMMs")
+  }
+
   start <- Sys.time()
+
+  data_list <- list()
+  if (TYPE == "GLMM") {
+    obj.gh <- statmod::gauss.quad(NGH, "hermite")
+    ws <- obj.gh$weights * exp(obj.gh$nodes^2)
+    df <- cbind(Y, X)
+    listx <- lapply(
+      by(model.matrix(as.formula(FRML), data = df) * 1.0, df$g, identity),
+      as.matrix
+    )
+    listy <- split(Y * 1.0, df$g)
+    listd <- split(df$size * 1.0, df$g)
+    data_list <- list(
+      x = listx,
+      y = listy,
+      den = listd,
+      niter = 10,
+      ws = ws,
+      z = obj.gh$nodes
+    )
+  }
 
   res <- list()
 
@@ -575,61 +604,134 @@ armb4 <- function(
     if (VERBOSE) {
       cat("Tuning the stepsize... ")
     }
-    set.seed(SEED)
-    resample_ids <- sample(1:length(Y), length(Y), replace = TRUE)
-    tune <- tune_armGLM3(
-      Y = as.numeric(Y[resample_ids]),
-      X = X[resample_ids, ],
-      FAMILY = FAMILY$family,
-      LINK = FAMILY$link,
-      THETA0 = MLE,
-      LENGTH = TUNE_CONTROL$LENGTH,
-      BURN = TUNE_CONTROL$BURN,
-      STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
-      SCALE = TUNE_CONTROL$SCALE,
-      MAXA = TUNE_CONTROL$MAXA,
-      AUTO_STOP = TUNE_CONTROL$AUTO,
-      VERBOSE = TUNE_CONTROL$VERBOSE,
-      SEED = ARM_CONTROL$SEED,
-      CONV_CHECK = ARM_CONTROL$CONV_CHECK,
-      CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
-      TOL = ARM_CONTROL$TOL
-    )
 
-    res$tune <- tune
-    ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$nlls)][1]
-    if (VERBOSE) cat("| Value chosen:", round(ARM_CONTROL$STEPSIZE0, 4), "\n")
-  }
-
-  if (VERBOSE) {
-    cat("Running ", NSIM, " ARM chains... ")
-  }
-  chains <- pbapply::pblapply(
-    1:NSIM,
-    function(id) {
-      set.seed(id)
-      resample_idx <- sample(1:nrow(X), nrow(X), replace = TRUE)
-      chain.id <- armGLM3(
-        Y = Y[resample_idx],
-        X = X[resample_idx, ],
+    if (TYPE == "GLM") {
+      set.seed(SEED)
+      resample_ids <- sample(1:length(Y), length(Y), replace = TRUE)
+      tune <- tune_armGLM3(
+        Y = as.numeric(Y[resample_ids]),
+        X = X[resample_ids, ],
         FAMILY = FAMILY$family,
         LINK = FAMILY$link,
         THETA0 = MLE,
-        LENGTH = length(Y),
-        BURN = ARM_CONTROL$BURN,
+        LENGTH = TUNE_CONTROL$LENGTH,
+        BURN = TUNE_CONTROL$BURN,
         STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
-        TRIM = ARM_CONTROL$TRIM,
-        VERBOSE = ARM_CONTROL$VERBOSE,
+        SCALE = TUNE_CONTROL$SCALE,
+        MAXA = TUNE_CONTROL$MAXA,
+        AUTO_STOP = TUNE_CONTROL$AUTO,
+        VERBOSE = TUNE_CONTROL$VERBOSE,
         SEED = ARM_CONTROL$SEED,
         CONV_CHECK = ARM_CONTROL$CONV_CHECK,
         CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
         TOL = ARM_CONTROL$TOL
       )
-      return(chain.id)
-    },
-    cl = NCORES
-  )
 
+      res$tune <- tune
+      ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$nlls)][1]
+      if (VERBOSE) cat("| Value chosen:", round(ARM_CONTROL$STEPSIZE0, 4), "\n")
+    } else {
+      set.seed(SEED)
+      resample_idx <- sample(
+        1:length(data_list$x),
+        length(data_list$x),
+        replace = TRUE
+      )
+      tune <- tune_armLOGRI2(
+        LIST_X = data_list$x[resample_idx],
+        LIST_Y = data_list$y[resample_idx],
+        LIST_D = data_list$den[resample_idx],
+        THETA0 = MLE,
+        AGH_NITER = data_list$niter,
+        WS = data_list$ws,
+        Z = data_list$z,
+        LENGTH = TUNE_CONTROL$LENGTH,
+        BURN = TUNE_CONTROL$BURN,
+        STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
+        SCALE = TUNE_CONTROL$SCALE,
+        MAXA = TUNE_CONTROL$MAXA,
+        AUTO_STOP = TUNE_CONTROL$AUTO,
+        VERBOSE = TUNE_CONTROL$VERBOSE,
+        SEED = ARM_CONTROL$SEED,
+        CONV_CHECK = ARM_CONTROL$CONV_CHECK,
+        CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
+        TOL = ARM_CONTROL$TOL
+      )
+      res$tune <- tune
+      ARM_CONTROL$STEPSIZE0 <- tune$stepsizes[which.min(tune$nlls)][1]
+      if (VERBOSE) cat("| Value chosen:", round(ARM_CONTROL$STEPSIZE0, 4), "\n")
+    }
+  }
+
+  if (VERBOSE) {
+    cat("Running ", NSIM, " ARM chains... ")
+  }
+
+  chains <- list()
+  if (TYPE == "GLM") {
+    chains <- pbapply::pblapply(
+      1:NSIM,
+      function(id) {
+        set.seed(id)
+        resample_idx <- sample(1:nrow(X), nrow(X), replace = TRUE)
+
+        chain.id <- 0
+        chain.id <- armGLM3(
+          Y = Y[resample_idx],
+          X = X[resample_idx, ],
+          FAMILY = FAMILY$family,
+          LINK = FAMILY$link,
+          THETA0 = MLE,
+          LENGTH = length(Y),
+          BURN = ARM_CONTROL$BURN,
+          STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
+          TRIM = ARM_CONTROL$TRIM,
+          VERBOSE = ARM_CONTROL$VERBOSE,
+          SEED = ARM_CONTROL$SEED,
+          CONV_CHECK = ARM_CONTROL$CONV_CHECK,
+          CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
+          TOL = ARM_CONTROL$TOL
+        )
+        return(chain.id)
+      },
+      cl = NCORES
+    )
+  } else {
+    chains <- pbapply::pblapply(
+      1:NSIM,
+      function(id) {
+        set.seed(id)
+        resample_idx <- sample(
+          1:length(data_list$x),
+          length(data_list$x),
+          replace = TRUE
+        )
+        chain.id <- 0
+        chain.id <- armLOGRI2(
+          LIST_X = data_list$x[resample_idx],
+          LIST_Y = data_list$y[resample_idx],
+          LIST_D = data_list$den[resample_idx],
+          THETA0 = MLE,
+          AGH_NITER = data_list$niter,
+          WS = data_list$ws,
+          Z = data_list$z,
+          LENGTH = length(data_list$y),
+          BURN = ARM_CONTROL$BURN,
+          STEPSIZE0 = ARM_CONTROL$STEPSIZE0,
+          TRIM = ARM_CONTROL$TRIM,
+          VERBOSE = ARM_CONTROL$VERBOSE,
+          SEED = ARM_CONTROL$SEED,
+          CONV_CHECK = ARM_CONTROL$CONV_CHECK,
+          CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
+          TOL = ARM_CONTROL$TOL
+        )
+        return(chain.id)
+      },
+      cl = NCORES
+    )
+  }
+
+  res$data_list <- data
   res$chains <- chains
   res$time <- difftime(Sys.time(), start, units = 'secs')
   res$pars <- purrr::reduce(purrr::map(chains, ~ .$avdelta), rbind)
