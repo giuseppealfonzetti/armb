@@ -427,7 +427,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // armGLM3
-Rcpp::List armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, const Eigen::Map<Eigen::VectorXd> THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL, const double MINEIG);
+Rcpp::List armGLM3(const Eigen::Map<Eigen::VectorXd> Y, const Eigen::Map<Eigen::MatrixXd> X, const std::string FAMILY, const std::string LINK, Eigen::VectorXd THETA0, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL, const double MINEIG);
 RcppExport SEXP _armb_armGLM3(SEXP YSEXP, SEXP XSEXP, SEXP FAMILYSEXP, SEXP LINKSEXP, SEXP THETA0SEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP, SEXP MINEIGSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -436,7 +436,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
     Rcpp::traits::input_parameter< const std::string >::type FAMILY(FAMILYSEXP);
     Rcpp::traits::input_parameter< const std::string >::type LINK(LINKSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type THETA0(THETA0SEXP);
     Rcpp::traits::input_parameter< const int >::type LENGTH(LENGTHSEXP);
     Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
     Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);

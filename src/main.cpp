@@ -716,7 +716,7 @@ Rcpp::List armGLM3(
   const Eigen::Map<Eigen::MatrixXd> X,
   const std::string FAMILY,
   const std::string LINK,
-  const Eigen::Map<Eigen::VectorXd> THETA0,
+  Eigen::VectorXd THETA0,
   const int LENGTH,
   const int BURN,
   const double STEPSIZE0,
@@ -919,7 +919,8 @@ Rcpp::List tune_armGLM3(
     int idx = 0;
     if(VERBOSE) Rcpp::Rcout  <<"Stepsize:"<<std::setprecision(4)<<stepsize0<<" | ";
 
-    Rcpp::List fit = armGLM3(Y, X, FAMILY, LINK, THETA0, LENGTH, BURN, stepsize0,
+    Eigen::VectorXd delta0 = Eigen::VectorXd::Zero(THETA0.size());
+    Rcpp::List fit = armGLM3(Y, X, FAMILY, LINK, delta0, LENGTH, BURN, stepsize0,
                            SEED, false, 1000, CONV_WINDOW, CONV_CHECK, TOL);
 
     stepsizes.push_back(stepsize0);
