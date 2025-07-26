@@ -121,67 +121,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// armLOGRI
-Rcpp::List armLOGRI(Rcpp::List LIST_X, Rcpp::List LIST_Y, Rcpp::List LIST_D, const Eigen::Map<Eigen::VectorXd> THETA0, const int AGH_NITER, Rcpp::DoubleVector WS, Rcpp::DoubleVector Z, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double PAR1, const double PAR2, const double PAR3, const int VERBOSE_WINDOW, const int PATH_WINDOW, const int SEED, const bool VERBOSE, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
-RcppExport SEXP _armb_armLOGRI(SEXP LIST_XSEXP, SEXP LIST_YSEXP, SEXP LIST_DSEXP, SEXP THETA0SEXP, SEXP AGH_NITERSEXP, SEXP WSSEXP, SEXP ZSEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP VERBOSE_WINDOWSEXP, SEXP PATH_WINDOWSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_X(LIST_XSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_Y(LIST_YSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_D(LIST_DSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
-    Rcpp::traits::input_parameter< const int >::type AGH_NITER(AGH_NITERSEXP);
-    Rcpp::traits::input_parameter< Rcpp::DoubleVector >::type WS(WSSEXP);
-    Rcpp::traits::input_parameter< Rcpp::DoubleVector >::type Z(ZSEXP);
-    Rcpp::traits::input_parameter< const int >::type MAXT(MAXTSEXP);
-    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
-    Rcpp::traits::input_parameter< const int >::type BATCH(BATCHSEXP);
-    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR1(PAR1SEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR2(PAR2SEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR3(PAR3SEXP);
-    Rcpp::traits::input_parameter< const int >::type VERBOSE_WINDOW(VERBOSE_WINDOWSEXP);
-    Rcpp::traits::input_parameter< const int >::type PATH_WINDOW(PATH_WINDOWSEXP);
-    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
-    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
-    Rcpp::traits::input_parameter< const int >::type CONV_WINDOW(CONV_WINDOWSEXP);
-    Rcpp::traits::input_parameter< const bool >::type CONV_CHECK(CONV_CHECKSEXP);
-    Rcpp::traits::input_parameter< const double >::type TOL(TOLSEXP);
-    rcpp_result_gen = Rcpp::wrap(armLOGRI(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, PAR1, PAR2, PAR3, VERBOSE_WINDOW, PATH_WINDOW, SEED, VERBOSE, CONV_WINDOW, CONV_CHECK, TOL));
-    return rcpp_result_gen;
-END_RCPP
-}
-// tune_armLOGRI
-Rcpp::List tune_armLOGRI(Rcpp::List LIST_X, Rcpp::List LIST_Y, Rcpp::List LIST_D, const Eigen::Map<Eigen::VectorXd> THETA0, const int AGH_NITER, Rcpp::DoubleVector WS, Rcpp::DoubleVector Z, const int MAXT, const int BURN, const int BATCH, const double STEPSIZE0, const double SCALE, const double MAXA, const double PAR1, const double PAR2, const double PAR3, const bool AUTO_STOP, const int SKIP_PRINT, const int SEED, const bool VERBOSE);
-RcppExport SEXP _armb_tune_armLOGRI(SEXP LIST_XSEXP, SEXP LIST_YSEXP, SEXP LIST_DSEXP, SEXP THETA0SEXP, SEXP AGH_NITERSEXP, SEXP WSSEXP, SEXP ZSEXP, SEXP MAXTSEXP, SEXP BURNSEXP, SEXP BATCHSEXP, SEXP STEPSIZE0SEXP, SEXP SCALESEXP, SEXP MAXASEXP, SEXP PAR1SEXP, SEXP PAR2SEXP, SEXP PAR3SEXP, SEXP AUTO_STOPSEXP, SEXP SKIP_PRINTSEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_X(LIST_XSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_Y(LIST_YSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type LIST_D(LIST_DSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type THETA0(THETA0SEXP);
-    Rcpp::traits::input_parameter< const int >::type AGH_NITER(AGH_NITERSEXP);
-    Rcpp::traits::input_parameter< Rcpp::DoubleVector >::type WS(WSSEXP);
-    Rcpp::traits::input_parameter< Rcpp::DoubleVector >::type Z(ZSEXP);
-    Rcpp::traits::input_parameter< const int >::type MAXT(MAXTSEXP);
-    Rcpp::traits::input_parameter< const int >::type BURN(BURNSEXP);
-    Rcpp::traits::input_parameter< const int >::type BATCH(BATCHSEXP);
-    Rcpp::traits::input_parameter< const double >::type STEPSIZE0(STEPSIZE0SEXP);
-    Rcpp::traits::input_parameter< const double >::type SCALE(SCALESEXP);
-    Rcpp::traits::input_parameter< const double >::type MAXA(MAXASEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR1(PAR1SEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR2(PAR2SEXP);
-    Rcpp::traits::input_parameter< const double >::type PAR3(PAR3SEXP);
-    Rcpp::traits::input_parameter< const bool >::type AUTO_STOP(AUTO_STOPSEXP);
-    Rcpp::traits::input_parameter< const int >::type SKIP_PRINT(SKIP_PRINTSEXP);
-    Rcpp::traits::input_parameter< const int >::type SEED(SEEDSEXP);
-    Rcpp::traits::input_parameter< const bool >::type VERBOSE(VERBOSESEXP);
-    rcpp_result_gen = Rcpp::wrap(tune_armLOGRI(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z, MAXT, BURN, BATCH, STEPSIZE0, SCALE, MAXA, PAR1, PAR2, PAR3, AUTO_STOP, SKIP_PRINT, SEED, VERBOSE));
-    return rcpp_result_gen;
-END_RCPP
-}
 // armLOGRI2
 Rcpp::List armLOGRI2(Rcpp::List LIST_X, Rcpp::List LIST_Y, Rcpp::List LIST_D, const Eigen::Map<Eigen::VectorXd> THETA0, const int AGH_NITER, Rcpp::DoubleVector WS, Rcpp::DoubleVector Z, const int LENGTH, const int BURN, const double STEPSIZE0, const int SEED, const bool VERBOSE, const int TRIM, const int CONV_WINDOW, const bool CONV_CHECK, const double TOL);
 RcppExport SEXP _armb_armLOGRI2(SEXP LIST_XSEXP, SEXP LIST_YSEXP, SEXP LIST_DSEXP, SEXP THETA0SEXP, SEXP AGH_NITERSEXP, SEXP WSSEXP, SEXP ZSEXP, SEXP LENGTHSEXP, SEXP BURNSEXP, SEXP STEPSIZE0SEXP, SEXP SEEDSEXP, SEXP VERBOSESEXP, SEXP TRIMSEXP, SEXP CONV_WINDOWSEXP, SEXP CONV_CHECKSEXP, SEXP TOLSEXP) {
@@ -398,8 +337,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_armb_grAGHi", (DL_FUNC) &_armb_grAGHi, 9},
     {"_armb_likAGH", (DL_FUNC) &_armb_likAGH, 8},
     {"_armb_grAGH", (DL_FUNC) &_armb_grAGH, 8},
-    {"_armb_armLOGRI", (DL_FUNC) &_armb_armLOGRI, 21},
-    {"_armb_tune_armLOGRI", (DL_FUNC) &_armb_tune_armLOGRI, 20},
     {"_armb_armLOGRI2", (DL_FUNC) &_armb_armLOGRI2, 16},
     {"_armb_tune_armLOGRI2", (DL_FUNC) &_armb_tune_armLOGRI2, 19},
     {"_armb_armGLM3", (DL_FUNC) &_armb_armGLM3, 15},

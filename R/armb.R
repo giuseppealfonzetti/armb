@@ -723,6 +723,8 @@ armb4 <- function(
           CONV_WINDOW = ARM_CONTROL$CONV_WINDOW,
           TOL = ARM_CONTROL$TOL
         )
+        chain.id$avdelta <- chain.id$avdelta *
+          sqrt(length(Y) / chain.id$effective_size)
         return(chain.id)
       },
       cl = NCORES

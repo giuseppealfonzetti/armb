@@ -321,225 +321,225 @@ Rcpp::DoubleVector grAGH(Rcpp::DoubleVector beta, double sigma,
 }
 
 
-//' @export
-// [[Rcpp::export]]
-Rcpp::List armLOGRI(
-  Rcpp::List LIST_X,
-  Rcpp::List LIST_Y,
-  Rcpp::List LIST_D,
-  const Eigen::Map<Eigen::VectorXd> THETA0,
-  const int AGH_NITER,
-  Rcpp::DoubleVector WS,
-  Rcpp::DoubleVector Z,
-  const int MAXT,
-  const int BURN,
-  const int BATCH,
-  const double STEPSIZE0,
-  const double PAR1,
-  const double PAR2,
-  const double PAR3,
-  const int VERBOSE_WINDOW,
-  const int PATH_WINDOW,
-  const int SEED,
-  const bool VERBOSE,
-  const int CONV_WINDOW = 1000,
-  const bool CONV_CHECK = false,
-  const double TOL = 1e-5
-){
+// //' @export
+// // [[Rcpp::export]]
+// Rcpp::List armLOGRI(
+//   Rcpp::List LIST_X,
+//   Rcpp::List LIST_Y,
+//   Rcpp::List LIST_D,
+//   const Eigen::Map<Eigen::VectorXd> THETA0,
+//   const int AGH_NITER,
+//   Rcpp::DoubleVector WS,
+//   Rcpp::DoubleVector Z,
+//   const int MAXT,
+//   const int BURN,
+//   const int BATCH,
+//   const double STEPSIZE0,
+//   const double PAR1,
+//   const double PAR2,
+//   const double PAR3,
+//   const int VERBOSE_WINDOW,
+//   const int PATH_WINDOW,
+//   const int SEED,
+//   const bool VERBOSE,
+//   const int CONV_WINDOW = 1000,
+//   const bool CONV_CHECK = false,
+//   const double TOL = 1e-5
+// ){
 
 
 
 
-  // Identify dimensions
-  int n = LIST_Y.size();
-  const int m = THETA0.size();
-  const int p = m-1;
+//   // Identify dimensions
+//   int n = LIST_Y.size();
+//   const int m = THETA0.size();
+//   const int p = m-1;
 
-  std::vector<int> path_iters;
-  std::vector<Eigen::VectorXd> path_theta;
-  std::vector<double> path_nll;
-  std::vector<int> path_obs;
+//   std::vector<int> path_iters;
+//   std::vector<Eigen::VectorXd> path_theta;
+//   std::vector<double> path_nll;
+//   std::vector<int> path_obs;
 
-  Eigen::VectorXd theta = THETA0;
-  Eigen::VectorXd avtheta = THETA0;
-  int last_iter = 0;
-
-
-  double nll = 10000;
-  double prev_nll;
-  bool convergence = false;
-  int idx = 0;
-  int shf = 0;
-  std::vector<int> pool(n) ;
-  std::iota(std::begin(pool), std::end(pool), 0);
-  std::mt19937 randomizer(SEED);
-  std::shuffle(pool.begin(), pool.end(), randomizer);
-  for(int t = 0; t <= MAXT; t++){
-    Rcpp::checkUserInterrupt();
-
-    // Store previous iteration results
-    if(((t)%PATH_WINDOW == 0) | (t==MAXT)){
-      path_iters.push_back(t);
-      path_nll.push_back(nll);
-      path_theta.push_back(avtheta);
-    }
-
-    if(CONV_CHECK & (t>BURN)){
-      if(t%CONV_WINDOW == 0){
-        // Current nll
-        prev_nll = nll;
-        // nll = resp.nll_(Y, resp.linkinv_(X*avtheta))/n;
-        // if(VERBOSE) Rcpp::Rcout <<"Iter "<< t<< ", nll: " << nll << "\n";
-        //
-        // if((prev_nll-nll)/CONV_WINDOW <=TOL | (nll-prev_nll)>0){
-        //   convergence = true;
-        //   last_iter = t;
-        //   break;
-        // }
-      }
-    }
-    // Break at t == MAXT (t starts from 0)
-
-    if(t==MAXT){
-      last_iter = t;
-      break;
-    }
-
-    if((idx+BATCH)>n){
-      idx = 0;
-      // x = shuffleRows(X, SEED + shf);
-      // y = shuffleVec(Y, SEED + shf);
-      std::mt19937 randomizer(SEED+shf);
-      std::shuffle(pool.begin(), pool.end(), randomizer);
-      shf++;
-    }
-
-    int obs = pool.at(idx);
-    path_obs.push_back(obs);
-
-    Eigen::VectorXd ngr = grAGHi(theta.segment(0,p), theta(p), LIST_X, LIST_Y, LIST_D,
-           AGH_NITER, WS, Z, obs);
-
-    // ngr.tail(1)/=10;
-    double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*(t+1), -PAR3);
-    theta -= stepsize_t * ngr;
-
-    if(t <= BURN){
-      avtheta = theta;
-    }else{
-      avtheta = ( (t - BURN) * avtheta + theta ) / (t - BURN + 1);
-    }
-
-    idx += BATCH;
-    last_iter++;
-  }
+//   Eigen::VectorXd theta = THETA0;
+//   Eigen::VectorXd avtheta = THETA0;
+//   int last_iter = 0;
 
 
-  Rcpp::List output = Rcpp::List::create(
-    Rcpp::Named("path_theta") = path_theta,
-    Rcpp::Named("path_iters") = path_iters,
-    Rcpp::Named("path_nll") = path_nll,
-    Rcpp::Named("path_obs") = path_obs,
-    Rcpp::Named("theta") = theta,
-    Rcpp::Named("avtheta") = avtheta,
-    Rcpp::Named("last_iter") = last_iter,
-    Rcpp::Named("convergence") = convergence
-  );
+//   double nll = 10000;
+//   double prev_nll;
+//   bool convergence = false;
+//   int idx = 0;
+//   int shf = 0;
+//   std::vector<int> pool(n) ;
+//   std::iota(std::begin(pool), std::end(pool), 0);
+//   std::mt19937 randomizer(SEED);
+//   std::shuffle(pool.begin(), pool.end(), randomizer);
+//   for(int t = 0; t <= MAXT; t++){
+//     Rcpp::checkUserInterrupt();
 
-  return output;
-}
+//     // Store previous iteration results
+//     if(((t)%PATH_WINDOW == 0) | (t==MAXT)){
+//       path_iters.push_back(t);
+//       path_nll.push_back(nll);
+//       path_theta.push_back(avtheta);
+//     }
 
-//' @export
-// [[Rcpp::export]]
-Rcpp::List tune_armLOGRI(
-  Rcpp::List LIST_X,
-  Rcpp::List LIST_Y,
-  Rcpp::List LIST_D,
-  const Eigen::Map<Eigen::VectorXd> THETA0,
-  const int AGH_NITER,
-  Rcpp::DoubleVector WS,
-  Rcpp::DoubleVector Z,
-  const int MAXT,
-  const int BURN,
-  const int BATCH,
-  const double STEPSIZE0,
-  const double SCALE,
-  const double MAXA,
-  const double PAR1,
-  const double PAR2,
-  const double PAR3,
-  const bool AUTO_STOP,
-  const int SKIP_PRINT,
-  const int SEED,
-  const bool VERBOSE
-){
+//     if(CONV_CHECK & (t>BURN)){
+//       if(t%CONV_WINDOW == 0){
+//         // Current nll
+//         prev_nll = nll;
+//         // nll = resp.nll_(Y, resp.linkinv_(X*avtheta))/n;
+//         // if(VERBOSE) Rcpp::Rcout <<"Iter "<< t<< ", nll: " << nll << "\n";
+//         //
+//         // if((prev_nll-nll)/CONV_WINDOW <=TOL | (nll-prev_nll)>0){
+//         //   convergence = true;
+//         //   last_iter = t;
+//         //   break;
+//         // }
+//       }
+//     }
+//     // Break at t == MAXT (t starts from 0)
 
+//     if(t==MAXT){
+//       last_iter = t;
+//       break;
+//     }
 
+//     if((idx+BATCH)>n){
+//       idx = 0;
+//       // x = shuffleRows(X, SEED + shf);
+//       // y = shuffleVec(Y, SEED + shf);
+//       std::mt19937 randomizer(SEED+shf);
+//       std::shuffle(pool.begin(), pool.end(), randomizer);
+//       shf++;
+//     }
 
+//     int obs = pool.at(idx);
+//     path_obs.push_back(obs);
 
-  // Identify dimensions
-  int n = LIST_Y.size();
-  const int m = THETA0.size();
-  const int p = m-1;
+//     Eigen::VectorXd ngr = grAGHi(theta.segment(0,p), theta(p), LIST_X, LIST_Y, LIST_D,
+//            AGH_NITER, WS, Z, obs);
 
-  std::vector<int> path_iters;
-  std::vector<Eigen::VectorXd> path_theta;
-  std::vector<double> path_nll;
-  std::vector<int> path_obs;
+//     // ngr.tail(1)/=10;
+//     double stepsize_t = STEPSIZE0 * PAR1 * pow(1 + PAR2*STEPSIZE0*(t+1), -PAR3);
+//     theta -= stepsize_t * ngr;
 
-  Eigen::VectorXd theta = THETA0;
-  Eigen::VectorXd avtheta = THETA0;
-  int last_iter = 0;
+//     if(t <= BURN){
+//       avtheta = theta;
+//     }else{
+//       avtheta = ( (t - BURN) * avtheta + theta ) / (t - BURN + 1);
+//     }
 
-
-  double nll = 10000;
-  double prev_nll;
-  bool convergence = false;
-  int idx = 0;
-  int shf = 0;
-  std::vector<int> pool(n) ;
-  std::iota(std::begin(pool), std::end(pool), 0);
-  std::mt19937 randomizer(SEED);
-  std::shuffle(pool.begin(), pool.end(), randomizer);
-
-  std::vector<double> stepsizes;
-  std::vector<double> devresids;
-
-  double stepsize0 = STEPSIZE0;
-  for(int a = 0; a < MAXA; a++){
-
-    int idx = 0;
-    if(VERBOSE) Rcpp::Rcout  <<"Stepsize:"<<std::setprecision(4)<<stepsize0<<" | ";
-
-    Rcpp::List fit = armLOGRI(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z,
-                              MAXT, BURN, BATCH, stepsize0, PAR1, PAR2, PAR3,
-                              1, 10, SEED, false, 1000, false, 1e-5);
-
-    stepsizes.push_back(stepsize0);
-    Eigen::VectorXd avtheta = fit["avtheta"];
-    double llik = -likAGH(avtheta.segment(0,p), avtheta(p), LIST_X, LIST_Y, LIST_D,
-                         AGH_NITER, WS, Z)/n;
-    if(VERBOSE) Rcpp::Rcout  <<"llik:"<<std::setprecision(4)<<llik<<"\n";
-
-    if((a>0) & AUTO_STOP){
-      if(llik > devresids.back()){
-        devresids.push_back(llik);
-        if(VERBOSE) Rcpp::Rcout  <<"Stopped at attempt "<<a+1<<"\n";
-        break;
-      }
-    }
-    devresids.push_back(llik);
-    stepsize0 *= SCALE;
-  }
+//     idx += BATCH;
+//     last_iter++;
+//   }
 
 
-  Rcpp::List output = Rcpp::List::create(
-    Rcpp::Named("stepsizes") = stepsizes,
-    Rcpp::Named("devresids") = devresids
-  );
+//   Rcpp::List output = Rcpp::List::create(
+//     Rcpp::Named("path_theta") = path_theta,
+//     Rcpp::Named("path_iters") = path_iters,
+//     Rcpp::Named("path_nll") = path_nll,
+//     Rcpp::Named("path_obs") = path_obs,
+//     Rcpp::Named("theta") = theta,
+//     Rcpp::Named("avtheta") = avtheta,
+//     Rcpp::Named("last_iter") = last_iter,
+//     Rcpp::Named("convergence") = convergence
+//   );
 
-  return output;
-}
+//   return output;
+// }
+
+// //' @export
+// // [[Rcpp::export]]
+// Rcpp::List tune_armLOGRI(
+//   Rcpp::List LIST_X,
+//   Rcpp::List LIST_Y,
+//   Rcpp::List LIST_D,
+//   const Eigen::Map<Eigen::VectorXd> THETA0,
+//   const int AGH_NITER,
+//   Rcpp::DoubleVector WS,
+//   Rcpp::DoubleVector Z,
+//   const int MAXT,
+//   const int BURN,
+//   const int BATCH,
+//   const double STEPSIZE0,
+//   const double SCALE,
+//   const double MAXA,
+//   const double PAR1,
+//   const double PAR2,
+//   const double PAR3,
+//   const bool AUTO_STOP,
+//   const int SKIP_PRINT,
+//   const int SEED,
+//   const bool VERBOSE
+// ){
+
+
+
+
+//   // Identify dimensions
+//   int n = LIST_Y.size();
+//   const int m = THETA0.size();
+//   const int p = m-1;
+
+//   std::vector<int> path_iters;
+//   std::vector<Eigen::VectorXd> path_theta;
+//   std::vector<double> path_nll;
+//   std::vector<int> path_obs;
+
+//   Eigen::VectorXd theta = THETA0;
+//   Eigen::VectorXd avtheta = THETA0;
+//   int last_iter = 0;
+
+
+//   double nll = 10000;
+//   double prev_nll;
+//   bool convergence = false;
+//   int idx = 0;
+//   int shf = 0;
+//   std::vector<int> pool(n) ;
+//   std::iota(std::begin(pool), std::end(pool), 0);
+//   std::mt19937 randomizer(SEED);
+//   std::shuffle(pool.begin(), pool.end(), randomizer);
+
+//   std::vector<double> stepsizes;
+//   std::vector<double> devresids;
+
+//   double stepsize0 = STEPSIZE0;
+//   for(int a = 0; a < MAXA; a++){
+
+//     int idx = 0;
+//     if(VERBOSE) Rcpp::Rcout  <<"Stepsize:"<<std::setprecision(4)<<stepsize0<<" | ";
+
+//     Rcpp::List fit = armLOGRI(LIST_X, LIST_Y, LIST_D, THETA0, AGH_NITER, WS, Z,
+//                               MAXT, BURN, BATCH, stepsize0, PAR1, PAR2, PAR3,
+//                               1, 10, SEED, false, 1000, false, 1e-5);
+
+//     stepsizes.push_back(stepsize0);
+//     Eigen::VectorXd avtheta = fit["avtheta"];
+//     double llik = -likAGH(avtheta.segment(0,p), avtheta(p), LIST_X, LIST_Y, LIST_D,
+//                          AGH_NITER, WS, Z)/n;
+//     if(VERBOSE) Rcpp::Rcout  <<"llik:"<<std::setprecision(4)<<llik<<"\n";
+
+//     if((a>0) & AUTO_STOP){
+//       if(llik > devresids.back()){
+//         devresids.push_back(llik);
+//         if(VERBOSE) Rcpp::Rcout  <<"Stopped at attempt "<<a+1<<"\n";
+//         break;
+//       }
+//     }
+//     devresids.push_back(llik);
+//     stepsize0 *= SCALE;
+//   }
+
+
+//   Rcpp::List output = Rcpp::List::create(
+//     Rcpp::Named("stepsizes") = stepsizes,
+//     Rcpp::Named("devresids") = devresids
+//   );
+
+//   return output;
+// }
 
 //' @export
 // [[Rcpp::export]]
@@ -585,6 +585,7 @@ Rcpp::List armLOGRI2(
   double nll = nll_start;
   double prev_nll = nll_start;
   double pf=1;
+  int effective_size=0;
 
   std::vector<int> path_iters; path_iters.push_back(0);
   std::vector<Eigen::VectorXd> path_theta; path_theta.push_back(mle);
@@ -615,6 +616,7 @@ Rcpp::List armLOGRI2(
     }
 
     int obs = pool.at(idx);
+    effective_size += Rcpp::IntegerVector(LIST_Y[obs]).size();
     // path_obs.push_back(obs);
 
     Eigen::VectorXd theta = delta+mle;
@@ -707,7 +709,8 @@ Rcpp::List armLOGRI2(
     Rcpp::Named("burn") = burn,
     Rcpp::Named("last_iter") = last_iter,
     Rcpp::Named("convergence") = convergence,
-    Rcpp::Named("shf") = shf
+    Rcpp::Named("shf") = shf,
+    Rcpp::Named("effective_size") = effective_size
   );
 
   return output;
